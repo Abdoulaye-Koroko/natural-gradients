@@ -9,7 +9,7 @@ def power_svd_mlp(a:torch.tensor,g:torch.tensor,v:torch.tensor,A:torch.tensor
                   ,G:torch.tensor,epsilon:float,max_iter:int,method:str)-> Tuple[torch.tensor]:
     
     """
-    Perform the power SVD algorithm for a mutlti-layer perceptron layer
+    Perform the power SVD algorithm for a mutlti-layer perceptron layer.
     
     Parameters:
     ----------
@@ -81,7 +81,7 @@ def power_svd_cnn(a:torch.tensor,g:torch.tensor,V:torch.tensor,A:torch.tensor,
                   G:torch.tensor,epsilon:float,max_iter:int,r:int,method:str)->Tuple[torch.tensor]:
     
     """
-    Perform the power SVD algorithm for a convolutional layer
+    Perform the power SVD algorithm for a convolutional layer.
     
     Parameters:
     ----------
@@ -103,7 +103,6 @@ def power_svd_cnn(a:torch.tensor,g:torch.tensor,V:torch.tensor,A:torch.tensor,
         Radius of the area used to approximate Z(F)v and Z(F)^Tu
     method: str
     One of the three methoths between kpsvd,deflation and kfac_cor
-    
     
     Returns
     --------

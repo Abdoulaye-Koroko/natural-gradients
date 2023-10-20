@@ -104,7 +104,6 @@ def power_svd_cnn(a:torch.tensor,g:torch.tensor,V:torch.tensor,A:torch.tensor,
     method: str
     One of the three methoths between kpsvd,deflation and kfac_cor
     
-    
     Returns
     --------
     R: torch.tensor

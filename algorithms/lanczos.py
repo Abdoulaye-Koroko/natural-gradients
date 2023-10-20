@@ -130,7 +130,6 @@ def lanczos_cnn(a:torch.tensor,g:torch.tensor,q:torch.tensor,K:int,epsilon:float
         Matrix corresping to left singular vector associated to the second singular value.
     Q: torch.tensor
         Matrix corresping to right singular vector associated to the second singular value.
-        
     
     """
     device = a.get_device()
