@@ -3,6 +3,7 @@ import torch.nn as nn
 
 seed = 0
 
+
 def xavier_uniform_init_weights(m):
     torch.manual_seed(seed)
     if type(m) == nn.Linear or type(m)==nn.Conv2d:
