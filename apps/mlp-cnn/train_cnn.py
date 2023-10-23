@@ -10,6 +10,8 @@ from models.initializations import*
 from optimizers.kfac import KFAC
 from optimizers.kpsvd import KPSVD
 from optimizers.deflation import Deflation
+from optimizers.kfac_cor import KFAC_CORRECTED
+from optimizers.lanczos import Lanczos
 
 def train(args):
     
@@ -90,6 +92,16 @@ def train(args):
         elif optim=="deflation":
             optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
             preconditioner = Deflation(model,damping=damping,pi=False,T_cov=100,T_inv=100,
+                 alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch)
+        
+        elif optim=="kfac_cor":
+            optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+            preconditioner = KFAC_CORRECTED(model,damping=damping,pi=False,T_cov=100,T_inv=100,
+                 alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch) 
+        
+        elif optim=="lanczos":
+            optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+            preconditioner = Lanczos(model,damping=damping,pi=False,T_cov=100,T_inv=100,
                  alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch)
            
         
