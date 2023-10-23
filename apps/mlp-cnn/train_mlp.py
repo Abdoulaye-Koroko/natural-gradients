@@ -8,6 +8,7 @@ from utils.train_utils import*
 from models.models import*
 from models.initializations import*
 from optimizers.kfac import KFAC
+from optimizers.kpsvd import KPSVD
 
 def train(args):
 
@@ -66,11 +67,10 @@ def train(args):
             criterion = nn.CrossEntropyLoss()
         
         since = time.time()
-        
-        train_samples,val_samples ,trainloader,testloader = read_data_sets(os.path.abspath('./data/' + data),batch_size)
+        data_root = "../../data/"
+        train_samples,val_samples ,trainloader,testloader = read_data_sets(os.path.abspath(data_root + data),batch_size)
         
         num_iter_per_epoch = len(trainloader)
-        npy_dir = os.path.join(root,"outputs_twolevel",tensorboard_name)
         total_iter = num_iter_per_epoch*num_epochs
         compute_time = 0.0
         
@@ -85,6 +85,11 @@ def train(args):
         elif optim=="kfac":
             optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
             preconditioner = KFAC(model,damping=damping,pi=False,T_cov=100,T_inv=100,
+                 alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch)
+        
+        elif optim=="kpsvd":
+            optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+            preconditioner = KPSVD(model,damping=damping,pi=False,T_cov=100,T_inv=100,
                  alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch)
         
         training_loss = []
