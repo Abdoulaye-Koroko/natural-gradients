@@ -1,5 +1,5 @@
 import torch
-from algorithms.lanczos import lanczos_mlp, lanczos_cnn
+from utils.optim_utils import lanczos_mlp, lanczos_cnn
 
 
 def test_lanczos_mlp():

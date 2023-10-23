@@ -1,5 +1,5 @@
 import torch
-from algorithms.power_svd import power_svd_mlp,power_svd_cnn
+from utils.optim_utils import power_svd_mlp,power_svd_cnn
 
 
 def test_power_svd_mlp():

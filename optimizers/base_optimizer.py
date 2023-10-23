@@ -14,7 +14,7 @@ class BaseOptimizer(ABC,Optimizer):
     """
     
     def __init__(self):
-        super().__init__([], {})
+        super().__init__([torch.zeros((1,1))], {})
     
     
     def _save_input(self, mod, i):

@@ -1,12 +1,13 @@
 import torch
-from optimizers.base_optimzer import BaseOptimizer
+import torch.nn.functional as F
+from optimizers.base_optimizer import BaseOptimizer
 
 
 
 class KFAC(BaseOptimizer):
 
     def __init__(self,net,damping=1e-3,pi=False,T_cov=100,T_inv=100,
-                 alpha=0.95, constraint_norm=False,kl=1e-2,batch_size=64):
+                 alpha=0.95, constraint_norm=False,clipping=1e-2,batch_size=64):
         
         """ 
         Inspired from https://github.com/Thrandis/EKFAC-pytorch. 
@@ -30,25 +31,27 @@ class KFAC(BaseOptimizer):
             Parameter for exponentially moving average
         constraint_norm: bool
             Wether to scale the gradient with Kl-clipping or not
-        kl: float
+        clipping: float
             Parameter to scale the gradient with kl-clipping
         batch_size: int
             Size of batch for computing the curvature matrix
         """
         
-        super(KFAC, self).__init__(self.params, {})
-        
+        super(KFAC, self).__init__()
+        self.param_groups.pop()
         self.damping = damping
         self.pi = pi
         self.T_cov = T_cov
         self.T_inv = T_inv
         self.alpha = alpha
         self.constraint_norm = constraint_norm
-        self.kl = kl
+        self.clipping = clipping
         self.batch_size = batch_size
         self.params = []
         self._fwd_handles = []
         self._bwd_handles = []
+        self.update_stats = False
+        self._iteration_counter = 0
         
         for mod in net.modules():
             mod_class = mod.__class__.__name__

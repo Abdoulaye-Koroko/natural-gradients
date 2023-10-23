@@ -13,60 +13,8 @@ class BaseOptimizer(ABC,Optimizer):
     
     """
     
-    def __init__(self,net,damping=1e-3,pi=False, T_cov=100,T_inv=100,
-                 alpha=0.95, constraint_norm=False,kl=1e-2,batch_size=64):
-    
-        """
-        Parameters
-        -----------
-        net: nn.Module
-            The model to train
-        damping: int
-            The regularization parameter
-        pi: bool
-            Whether to use to scale the regularization parmeter with traces of Kronecker 
-            factors or not
-        T_cov: int
-            The frequence at which the curvature matrix is updated
-        T_inv: int
-            The frequence at which the inverse of the curvature matrix is computed
-        alpha: float
-            Parameter for exponentially moving average
-        constraint_norm: bool
-            Wether to scale the gradient with Kl-clipping or not
-        kl: float
-            Parameter to scale the gradient with kl-clipping
-        batch_size: int
-            Size of batch for computing the curvature matrix
-        """
-        self.damping = damping
-        self.pi = pi
-        self.T_cov = T_cov
-        self.T_inv = T_inv
-        self.alpha = alpha
-        self.constraint_norm = constraint_norm
-        self.params = []
-        self._fwd_handles = []
-        self._bwd_handles = []
-        self._iteration_counter = 0
-        self.kl = kl
-        self.update_stats = True
-        self.batch_size = batch_size
-
-        for mod in net.modules():
-            mod_class = mod.__class__.__name__
-            if mod_class in ['Linear', 'Conv2d']:
-                handle = mod.register_forward_pre_hook(self._save_input)
-                self._fwd_handles.append(handle)
-                handle = mod.register_backward_hook(self._save_grad_output)
-                self._bwd_handles.append(handle)
-                params = [mod.weight]
-                if mod.bias is not None:
-                    params.append(mod.bias)
-                d = {'params': params, 'mod': mod, 'layer_type': mod_class}
-                self.params.append(d)
-
-        super().__init__(self.params, {})
+    def __init__(self):
+        super().__init__([torch.zeros((1,1))], {})
     
     
     def _save_input(self, mod, i):
@@ -94,7 +42,7 @@ class BaseOptimizer(ABC,Optimizer):
     
     @abstractmethod
     def _inv_covs(self, xxt, ggt, num_locations):
-        """ Compute inverses the covariance matrices."""
+        """Inverses the covariances."""
     
     def __del__(self):
         for handle in self._fwd_handles + self._bwd_handles:
