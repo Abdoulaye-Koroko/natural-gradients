@@ -261,10 +261,15 @@ class KPSVD(BaseOptimizer):
                   None,self.epsilon,self.max_iter,r,self.method)
         else:#self._iteration_counter > 0
             
+            v = state["ggt"]
+            
             rho = min(1-1/self._iteration_counter,self.alpha)
+            
             if group["layer_type"]=="Linear":
-                R,S = power_svd_mlp(x.t(),gy.t(),v.view(-1,1),None
+                
+                R,S = power_svd_mlp(x.t(),gy.t(),vec(v),None
                   ,None,self.epsilon,self.max_iter,self.method)
+                
             elif group["layer_type"]=="Conv2d":
                 x = x.t().contiguous().view(self.batch_size,T,x.shape[0]).permute(0,2,1)
                 gy = gy.t().contiguous().view(self.batch_size,T,gy.shape[0]).permute(0,2,1)
