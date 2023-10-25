@@ -63,7 +63,7 @@ def read_data_sets(name_dataset,batch_size):
 
 
         training_set = datasets.MNIST(root=train_dir, train=True,
-                                        download=False,transform=transform)
+                                        download=True,transform=transform)
         
         test_abs = 50000
         train_subset, val_subset = random_split(
@@ -78,7 +78,7 @@ def read_data_sets(name_dataset,batch_size):
         n_val = len(val_subset)
 
         val_set = datasets.MNIST(root=train_dir, train=False,
-                                       download=False, transform=transform)
+                                       download=True, transform=transform)
         testloader = torch.utils.data.DataLoader(val_subset, batch_size=batch_size,
                                          shuffle=False,drop_last=True)
         
