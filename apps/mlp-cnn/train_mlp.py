@@ -12,6 +12,7 @@ from optimizers.kpsvd import KPSVD
 from optimizers.deflation import Deflation
 from optimizers.kfac_cor import KFAC_CORRECTED
 from optimizers.lanczos import Lanczos
+from optimizers.twolevel_kfac import TwolevelKFAC
 
 def train(args):
 
@@ -109,6 +110,15 @@ def train(args):
             optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
             preconditioner = Lanczos(model,damping=damping,pi=False,T_cov=100,T_inv=100,
                  alpha=0.95, constraint_norm=True,clipping=clipping,batch_size=fisher_batch)
+        
+        elif optim=="twolevel_kfac":
+            optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+            preconditioner = TwolevelKFAC(model,damping=damping,pi=False,T_cov=100,T_inv=100,
+                 alpha=0.95,constraint_norm=True,clipping=clipping,batch_size=fisher_batch,coarse_space=args.coarse_space,krylov=args.krylov)
+        
+        else:
+            message = "Unknown optimizer make sure that you choose the optimizer name between [sgd,adam,kfac,kpsvd,deflation,kfac_cor,lanczos,twolevel_kfac]"
+            raise ValueError(message)
         
         training_loss = []
         train_itera_loss = []
@@ -278,11 +288,11 @@ if __name__=="__main__":
                         help='batch_size')
     
     
-    parser.add_argument('--lr', type=float, default=1e-2,
+    parser.add_argument('--lr', type=float, default=1e-5,
                         help='Learning rate')
     
     
-    parser.add_argument('--damping', type=float, default=1e-4,
+    parser.add_argument('--damping', type=float, default=1e-5,
                         help='damping')
     
       
@@ -297,6 +307,13 @@ if __name__=="__main__":
     
     parser.add_argument('--init_params', type=str, default='xavier_uniform',
                         help='Weights initialization strategy')
+    
+    parser.add_argument('--coarse_space', type=str, default='nicolaides',
+                        help='Coarse space used in two-level KFAC')
+    
+    parser.add_argument('--krylov', type=int, default=0,
+                        help='Whether to use krylov coarse space or not in two-level KFAC')
+    
     
 
     args = parser.parse_args()
