@@ -13,6 +13,7 @@ from optimizers.deflation import Deflation
 from optimizers.kfac_cor import KFAC_CORRECTED
 from optimizers.lanczos import Lanczos
 from optimizers.twolevel_kfac import TwolevelKFAC
+from optimizers.exact_natural_gradient import ExactNG
 
 def train(args):
     
@@ -109,9 +110,14 @@ def train(args):
             optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
             preconditioner = TwolevelKFAC(model,damping=damping,pi=False,T_cov=100,T_inv=100,
                  alpha=0.95,constraint_norm=True,clipping=clipping,batch_size=fisher_batch,coarse_space=args.coarse_space,krylov=args.krylov)
+        
+        elif optim=="exactNG":
+            optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+            preconditioner = ExactNG(model,method="NG_BD",damping=damping,damping_method='standard',
+                                     batch_size=64,constraint_norm=False,clipping=clipping) 
             
         else:
-            message = "Unknown optimizer make sure that you choose the optimizer name between [sgd,adam,kfac,kpsvd,deflation,kfac_cor,lanczos,twolevel_kfac]"
+            message = "Unknown optimizer make sure that you choose the optimizer name between [sgd,adam,kfac,kpsvd,deflation,kfac_cor,lanczos,twolevel_kfac,exactNG]"
             raise ValueError(message) 
            
         
