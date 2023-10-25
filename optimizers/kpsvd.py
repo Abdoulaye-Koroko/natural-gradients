@@ -18,7 +18,7 @@ class KPSVD(BaseOptimizer):
         -----------
         net: nn.Module
             The model to train
-        damping: int
+        damping: float
             The regularization parameter
         pi: bool
             Whether to use to scale the regularization parmeter with traces of Kronecker 
