@@ -114,7 +114,7 @@ You can train MLP or CNN networks with any optimizer using the `train_mlp.py` an
 
 For example, to train the MLP deep auto-encoder with the CURVES dataset with KFAC optimizer, you just need to run the following command:
 
-```
+```sh
 $ python apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac --lr 1e-4 --damping 1e-4
 
 ```
@@ -142,6 +142,50 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 - *--krylov*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
 
 
+### Deep convolutional auto-encoder
+
+
+### DCGANS
+
+
+## Training on a supercomputer
+
+Since of most clusters do not have access to the internet, it's difficult to configure python environments locally. Fortunately, conda-pack offers a solution for relocating conda environments to a new location. The full documentation is [here](https://conda.github.io/conda-pack/). 
+
+First clone the repo, create your environement, install all required packages and conda-pack:
+
+```sh
+$ https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
+$ cd natural-gradients
+$ conda create --name my_env
+$ conda activate my_env
+$ pip install -e .
+$ pip install -r requirements.txt
+$ conda install conda-pack
+```
+
+Then pack your environment:
+
+```sh
+$ conda pack -n my_env
+
+```
+An archive `my_env.tar.gz` is ceated and have to be copy on the supercomputer. For example, on `ener440`, you have to run
+
+```sh
+$ cd ..
+$ scp -r natural-gradients <login>@ener440
+```
+
+After that, you have to go on the supercomputer, untar the file `my_env.tar.gz` contained in natural-gradients folder and source the environnement
+
+```sh
+$ mkdir my_env
+$ tar -zxf my_env.tar.gz -C my_env
+$ source my_env/bin/activate
+```
+
+You can now train your models on the supercomputer.
 
 ## References
 
