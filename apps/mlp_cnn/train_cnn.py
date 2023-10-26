@@ -2,6 +2,7 @@ import torch
 import argparse
 import numpy as np
 import time 
+import warnings
 
 from utils.data_utils import*
 from utils.train_utils import*
@@ -14,6 +15,8 @@ from optimizers.kfac_cor import KFAC_CORRECTED
 from optimizers.lanczos import Lanczos
 from optimizers.twolevel_kfac import TwolevelKFAC
 from optimizers.exact_natural_gradient import ExactNG
+
+warnings.filterwarnings('ignore')
 
 def train(args):
     
