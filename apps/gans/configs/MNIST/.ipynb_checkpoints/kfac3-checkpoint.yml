@@ -1,0 +1,42 @@
+
+n_epochs: 200
+    
+batch_size: 128
+
+device: "cuda"
+
+z_dim: 64
+
+gen_optim: "adam"
+
+crit_optim: "kfac"
+
+beta_1: 0.5
+        
+beta_2: 0.999
+
+gen_lr:  0.001
+
+crit_lr: 0.0002
+
+clipping: 0.01
+
+damping: 0.00001
+
+T_cov: 100
+
+T_inv: 100
+
+momentum: 0.9
+
+display_step: 1000
+
+c_lambda: 10
+
+crit_repeats: 5
+
+data_root: "../../../data/"
+
+data: "MNIST"
+
+weight_decay: 0.001

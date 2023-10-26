@@ -1,0 +1,24 @@
+
+n_epochs: 5
+    
+batch_size: 64
+
+device: "cuda"
+
+z_dim: 64
+
+gen_optim: "adam"
+
+disc_optim: "adam"
+
+lr:  0.0002
+
+display_step: 50
+
+c_lambda: 10
+
+crit_repeats: 5
+
+data_root: "data/"
+
+data: "MNIST"

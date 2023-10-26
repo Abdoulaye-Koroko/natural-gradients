@@ -1,0 +1,408 @@
+import torch
+import matplotlib.pyplot as plt
+from torchvision import datasets, transforms
+import yaml
+import argparse
+import os 
+from tqdm.auto import tqdm
+import time
+import numpy as np
+import warnings
+
+from apps.gans.utils import*
+from apps.gans.models import*
+from optimizers.kfac import KFAC
+
+
+
+warnings.filterwarnings('ignore')
+
+
+_ = torch.manual_seed(0)
+
+
+def train(config):
+    
+    n_epochs = config['n_epochs']
+    
+    batch_size = config['batch_size']
+    
+    device = torch.device(config['device'])
+    
+    z_dim = config['z_dim']
+    
+    gen_optim = config['gen_optim']
+    
+    crit_optim = config['crit_optim']
+    
+    gen_lr = config['gen_lr']
+    
+    crit_lr = config['crit_lr']
+    
+    weight_decay = config['weight_decay']
+    
+    #display_step = config['display_step']
+    
+    c_lambda = config['c_lambda']
+    
+    crit_repeats = config['crit_repeats']
+    
+    data_root = config['data_root']
+    
+    data = config['data']
+    
+    if gen_optim=="kfac" and crit_optim=="kfac":
+        
+        images_folder = os.path.join("results",data,"images",gen_optim+"2",str(batch_size))
+        
+        name = gen_optim+"2"
+    
+    elif gen_optim=="kfac" and crit_optim!="kfac":
+        
+         images_folder = os.path.join("results",data,"images",gen_optim+"1",str(batch_size))
+        
+         name = gen_optim+"1"
+            
+        
+            
+    elif gen_optim!="kfac" and crit_optim=="kfac":
+        
+        images_folder = os.path.join("results",data,"images",crit_optim+"3",str(batch_size))
+        
+        name = crit_optim+"3"
+        
+    elif gen_optim=="sgd" and crit_optim=="sgd":
+        
+        images_folder = os.path.join("results",data,"images","sgda",str(batch_size))
+        
+        name = "sgda"
+        
+        
+    else:
+        
+        images_folder = os.path.join("results",data,"images",gen_optim,str(batch_size))
+        
+        name = gen_optim
+            
+        
+            
+    if not os.path.exists(images_folder):
+        
+        os.makedirs(images_folder,exist_ok=True)
+        
+    FID_folder = os.path.join("results",data,"fids",str(batch_size))
+    
+    if not os.path.exists(FID_folder):
+        
+        os.makedirs(FID_folder,exist_ok=True)
+    
+    losses_folder = os.path.join("results",data,"losses",str(batch_size))
+    
+    if not os.path.exists(losses_folder):
+        
+        os.makedirs(losses_folder,exist_ok=True)
+        
+    losses_folder = os.path.join(losses_folder,name)
+    
+        
+    
+    train_dir = os.path.join(data_root,data)
+    
+    if data== "MNIST":
+        
+        transform = transforms.Compose([
+                transforms.Resize(28),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,), (0.5,)),
+            ])
+
+        
+        training_set = datasets.MNIST(root=train_dir, train=True,
+                                        download=False,transform=transform)
+
+        dataloader =  torch.utils.data.DataLoader(training_set, batch_size=batch_size,
+                                          shuffle=True,drop_last=True)
+        
+        gen = Generator(z_dim).to(device)
+    
+        crit = Critic().to(device) 
+
+        gen = gen.apply(weights_init)
+
+        crit = crit.apply(weights_init)
+        
+    elif data=="CIFAR10":
+
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
+
+        training_set = datasets.CIFAR10(root=train_dir, train=True,
+                                    download=False,transform=transform)
+
+        dataloader =  torch.utils.data.DataLoader(training_set, batch_size=batch_size,
+                                      shuffle=True,drop_last=True)
+
+        ngf = 128
+
+        ndf = 128
+
+        nc = 3
+
+
+        gen = ResNet32Generator(z_dim, nc, ngf, True).to(device)
+
+        crit = ResNet32Discriminator(nc, 1, ndf, True).to(device) 
+
+        gen.apply(weights_init)
+
+        crit.apply(weights_init)
+
+    
+    
+    if gen_optim == "adam":
+        
+        beta_1 = config['beta_1']
+        
+        beta_2 = config['beta_2']
+        
+        gen_opt = torch.optim.Adam(gen.parameters(), lr=gen_lr, betas=(beta_1, beta_2))
+        
+        gen_precond = None
+    
+    elif gen_optim == "kfac":
+        
+        gen_opt = torch.optim.SGD(gen.parameters(),lr=gen_lr,momentum=config['momentum'],nesterov=False,weight_decay=weight_decay)
+        
+        gen_precond = KFAC(gen,damping=config['damping'],pi=False,T_cov=config['T_cov'],T_inv=config['T_inv'] ,
+                 alpha=0.95, constraint_norm=True,clipping=config['clipping'],batch_size=batch_size)
+        
+        gen_precond.update_stats = True
+        
+    
+    elif gen_optim =="sgd":
+        
+        gen_opt = torch.optim.SGD(gen.parameters(),lr=gen_lr,momentum=config['momentum'],nesterov=True,weight_decay=weight_decay)
+        
+        gen_precond = None
+    
+    
+    if crit_optim == "adam":
+        
+        beta_1 = config['beta_1']
+        
+        beta_2 = config['beta_2']
+        
+        crit_opt = torch.optim.Adam(crit.parameters(), lr=crit_lr, betas=(beta_1, beta_2))
+        
+        crit_precond = None
+    
+    elif crit_optim == "kfac":
+        
+        crit_opt = torch.optim.SGD(crit.parameters(),lr=crit_lr,momentum=config['momentum'],nesterov=False,weight_decay=weight_decay)
+       
+        crit_precond = KFAC(crit,damping=config['damping'],pi=False,T_cov=config['T_cov'],T_inv=config['T_inv'] ,
+                 alpha=0.95, constraint_norm=True,clipping=config['clipping'],batch_size=batch_size)
+        
+        crit_precond.update_stats = True
+        
+    
+    elif crit_optim=="sgd":
+        
+        crit_opt = torch.optim.SGD(crit.parameters(),lr=crit_lr,momentum=config['momentum'],nesterov=True,weight_decay=weight_decay)
+        
+        crit_precond = None
+             
+    
+    cur_step = 0
+    
+    generator_losses = []
+    
+    critic_losses = []
+    
+    inception_scores = []
+    
+    fids = []
+    
+    best_FID = 100000.0
+    
+    #display_step = len(dataloader)
+    display_step = 10
+    
+    
+    images_folder_fake = os.path.join(images_folder ,'fakes')
+                
+    images_folder_real = os.path.join(images_folder,'reals')
+    
+    if not os.path.exists(images_folder_fake):
+        
+        os.makedirs(images_folder_fake,exist_ok=True)
+        
+    if not os.path.exists(images_folder_real):
+        
+        os.makedirs(images_folder_real,exist_ok=True) 
+    
+    
+    
+    
+    #delete_folder_contents(output_folder_fake)
+    
+    #delete_folder_contents(output_folder_real)
+    
+    #fixed_noise = get_noise(batch_size, z_dim, device=device)
+    
+    for epoch in range(n_epochs):
+        
+        # Dataloader returns the batches
+        for real, _ in tqdm(dataloader):
+            
+            cur_batch_size = len(real)
+            
+            real = real.to(device)
+
+            mean_iteration_critic_loss = 0
+            
+            for _ in range(crit_repeats):
+                ### Update critic ###
+                crit_opt.zero_grad()
+                
+                fake_noise = get_noise(cur_batch_size, z_dim, device=device)
+                
+                fake = gen(fake_noise)
+                
+                crit_fake_pred = crit(fake.detach())
+                
+                crit_real_pred = crit(real)
+
+                epsilon = torch.rand(len(real), 1, 1, 1, device=device, requires_grad=True)
+                
+                gradient = get_gradient(crit, real, fake.detach(), epsilon)
+                
+                gp = gradient_penalty(gradient)
+                
+                crit_loss = get_crit_loss(crit_fake_pred, crit_real_pred, gp, c_lambda)
+
+                # Keep track of the average critic loss in this batch
+                mean_iteration_critic_loss += crit_loss.item() / crit_repeats
+                # Update gradients
+                crit_loss.backward(retain_graph=True)
+                # Update optimizer
+                if crit_precond is not None:
+                    
+                    crit_precond.step(update_params=True)
+                    
+                crit_opt.step()
+                
+            critic_losses += [mean_iteration_critic_loss]
+
+            ### Update generator ###
+            gen_opt.zero_grad()
+            
+            fake_noise_2 = get_noise(cur_batch_size, z_dim, device=device)
+            
+            fake_2 = gen(fake_noise_2)
+            
+            crit_fake_pred = crit(fake_2)
+
+            gen_loss = get_gen_loss(crit_fake_pred)
+            
+            gen_loss.backward()
+
+            # Update the weights
+            if gen_precond is not None:
+                
+                gen_precond.step(update_params=True)
+                
+            gen_opt.step()
+
+            # Keep track of the average generator loss
+            generator_losses += [gen_loss.item()]
+            
+            
+            #Scores
+            if data=="MNIST":
+
+                #IS = inception_score(fake.expand(-1,3,-1,-1),device)
+
+                #inception_scores +=[IS.cpu()]
+
+                FID = fid(real.expand(-1,3,-1,-1),fake.expand(-1,3,-1,-1),device)
+
+                fids +=[FID.cpu()]
+
+            else:
+
+                #IS = inception_score(fake,device)
+
+                #inception_scores +=[IS.cpu()]
+
+                FID = fid(real,fake,device)
+
+                fids +=[FID.cpu()] 
+
+
+
+            ### Visualization code ###
+            if cur_step % display_step == 0 and cur_step > 0:
+                
+                gen_mean = sum(generator_losses[-display_step:]) / display_step
+                
+                crit_mean = sum(critic_losses[-display_step:]) / display_step
+                
+                #IS_mean = sum(inception_scores[-display_step:]) / display_step
+                
+                FID_mean = sum(fids[-display_step:]) / display_step
+                
+                if FID_mean<best_FID:
+                    
+                    best_FID = FID_mean
+                
+                print(f"Epoch {epoch}/{n_epochs}: Generator loss: {gen_mean}, critic loss: {crit_mean}, FID: {FID_mean}, best FID: {best_FID }")
+
+
+                image_folder_fake_ =  os.path.join(images_folder_fake, str(epoch))
+                
+                image_folder_real_ = os.path.join(images_folder_real, str(epoch))
+                
+                show_tensor_images(image_tensor=fake_2,output_folder=image_folder_fake_,epoch=epoch)
+                
+                #show_tensor_images(image_tensor=real, output_folder=output_folder_real_)
+                
+                step_bins = display_step
+                
+                plot_losses(step_bins,generator_losses,critic_losses,losses_folder)
+                
+                #plot_IS(step_bins,inception_scores,os.path.join(output_folder,"IS"))
+                
+                plot_FID(step_bins,fids,os.path.join(FID_folder,name))
+
+            cur_step += 1
+
+    
+    results = {"FID": np.array(fids)}
+    
+    #np.save(os.path.join(FID_folder,name+'.npy'),results)
+     
+
+            
+            
+            
+            
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description='Function arguments')
+
+    parser.add_argument('--config', type=str, default ="configs/MNIST/adam.yml",
+                    help='path to config')
+
+    args = parser.parse_args() 
+    
+    with open(args.config, 'rb') as f:
+        
+        config = yaml.safe_load(f.read())  
+    
+    t1 = time.time()
+    
+    train(config)
+    
+    t2 = time.time()
+    
+    print(f"Elapsed time: {(t2-t1)//60} min {(t2-t1)%60} s")
