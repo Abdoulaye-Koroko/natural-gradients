@@ -4,13 +4,13 @@
 
 This repository provides implementation of several natural gradient-based optimization methods for training deep neural networks. It include the following methods (see in references section for more on each method)
 
-- [ ] KFAC
-- [ ] Two-level KFAC
-- [ ] KPSVD
-- [ ] Deflation
-- [ ] KFAC Corrected
-- [ ] Lanczos
-- [ ] Exact natural gratient with full Fisher matrix or with block-diagonal Fisher matrix
+- [x] KFAC
+- [x] Two-level KFAC
+- [x] KPSVD
+- [x] Deflation
+- [x] KFAC Corrected
+- [x] Lanczos
+- [x] Exact natural gratient with full Fisher matrix or with block-diagonal Fisher matrix
 
 
 Author: Abdoulaye Koroko
