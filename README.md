@@ -55,7 +55,6 @@ You can use the optimizers developed to train several types of deep neural netwo
 To use one of the proposed natural-gradient methods, you can write your training function as follows:
 
 ```python 
-
 #First import the preconditioner of interest as bellow
 from optimizers.kfac import KFAC
 from optimizers.kpsvd import KPSVD
@@ -78,16 +77,13 @@ dataset = Mydata()
 
 dataloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                           shuffle=True,drop_last=True)
-
 #Define your loss function
 criterion = Myloss()
-
 
 #device
 device = torch.device("cuda")
 
 # Training loop
-
 for iter,batch in enumerate(trainloader):
 
     optimizer.zero_grad()
@@ -109,9 +105,6 @@ for iter,batch in enumerate(trainloader):
         preconditioner.step(update_params=True) 
     
         optimizer.step()
-
-
-
 ```
 
 
