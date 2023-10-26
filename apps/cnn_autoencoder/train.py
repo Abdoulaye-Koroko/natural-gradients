@@ -2,11 +2,14 @@ import torch
 import argparse
 import numpy as np
 import time 
+import warnings
 
 from utils.data_utils import*
 from utils.train_utils import*
 from apps.cnn_autoencoder.models import*
 from optimizers.kfac import KFAC
+
+warnings.filterwarnings('ignore')
 
 seed = 0
 
