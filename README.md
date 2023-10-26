@@ -37,7 +37,21 @@ $ pip install -e .
 $ pip install -r requirements.txt
 ```
 
+## Usage
+You can use the optimizers developed to train several types of deep neural networks. Below are the different types of network with compatible optimizers
 
+- Multi-layer perceptrons (MLP) : all optimizer
+
+- Convolutional neural networks (CNN): all optimizer
+
+- Deep convolutional auto-encoder (contains transposed convolutional layers): KFAC
+
+- Deep convolutional GANs (contains transposed convolutional layers) : KFAC
+
+
+### MLP and CNN
+
+You can train MLP or CNN networks with any optimizer using the `train_mlp.py` and `train_cnn.py` functions defined in the apps/mlp_cnn folder `apps/mlp_cnn`.
 
 ## References
 
