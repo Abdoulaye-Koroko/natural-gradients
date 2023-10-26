@@ -25,7 +25,7 @@ Author: Abdoulaye Koroko
 Clone this repository:
 
 ```sh
-$ https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
+$ git clone https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
 $ cd natural-gradients
 
 ```
@@ -150,12 +150,12 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 ## Training on a supercomputer
 
-Since of most clusters do not have access to the internet, it's difficult to configure python environments locally. Fortunately, conda-pack offers a solution for relocating conda environments to a new location. The full documentation is [here](https://conda.github.io/conda-pack/). 
+Since most of clusters do not have access to the internet, it's difficult to configure python environments locally. Fortunately, conda-pack offers a solution for relocating conda environments to a new location. The full documentation is [here](https://conda.github.io/conda-pack/). 
 
 First clone the repo, create your environement, install all required packages and conda-pack:
 
 ```sh
-$ https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
+$ git clone https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
 $ cd natural-gradients
 $ conda create --name my_env
 $ conda activate my_env
@@ -170,14 +170,14 @@ Then pack your environment:
 $ conda pack -n my_env
 
 ```
-An archive `my_env.tar.gz` is ceated and have to be copy on the supercomputer. For example, on `ener440`, you have to run
+An archive `my_env.tar.gz` is ceated in the folder `natural-gradients`. Now you have to be copy the project on the supercomputer. For example, on `ener440`, you have to run
 
 ```sh
 $ cd ..
 $ scp -r natural-gradients <login>@ener440
 ```
 
-After that, you have to go on the supercomputer, untar the file `my_env.tar.gz` contained in natural-gradients folder and source the environnement
+After that, you have to go on the supercomputer, untar the file `my_env.tar.gz` contained in `natural-gradients` folder and source the environnement:
 
 ```sh
 $ mkdir my_env
