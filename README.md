@@ -38,6 +38,7 @@ $ pip install -r requirements.txt
 ```
 
 ## Usage
+
 You can use the optimizers developed to train several types of deep neural networks. Below are the different types of network with compatible optimizers
 
 - Multi-layer perceptrons (MLP) : all optimizer
@@ -47,6 +48,71 @@ You can use the optimizers developed to train several types of deep neural netwo
 - Deep convolutional auto-encoder (contains transposed convolutional layers): KFAC
 
 - Deep convolutional GANs (contains transposed convolutional layers) : KFAC
+
+
+### General use case
+
+To use one of the proposed natural-gradient methods, you can write your training function as follows:
+
+```python 
+
+#First import the preconditioner of interest as bellow
+from optimizers.kfac import KFAC
+from optimizers.kpsvd import KPSVD
+from optimizers.deflation import Deflation
+from optimizers.kfac_cor import KFAC_CORRECTED
+from optimizers.lanczos import Lanczos
+from optimizers.twolevel_kfac import TwolevelKFAC
+from optimizers.exact_natural_gradient import ExactNG
+
+# Define your model
+model = Mymodel()
+
+#Define the optimizer
+optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+
+preconditioner = KFAC(model) # It can be any of the imported preconditioner above
+
+#Define your dataloader
+dataset = Mydata()
+
+dataloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+                                          shuffle=True,drop_last=True)
+
+#Define your loss function
+criterion = Myloss()
+
+
+#device
+device = torch.device("cuda")
+
+# Training loop
+
+for iter,batch in enumerate(trainloader):
+
+    optimizer.zero_grad()
+    
+    inputs,labels=batch
+    
+    inputs,labels = inputs.to(device),labels.to(device)
+    
+    outputs = model(inputs)
+    
+    with torch.set_grad_enabled(True):
+        
+        loss = criterion(outputs,labels)
+        
+        preconditioner.update_stats = True
+        
+        loss.backward()
+        
+        preconditioner.step(update_params=True) 
+    
+        optimizer.step()
+
+
+
+```
 
 
 ### MLP and CNN
@@ -78,9 +144,9 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 - *--momentum*: momentum parameter
 
-- *--coarse_space*: The coarse space used in two-lvel KFAC. It can be `nicolaides`, `residual`, `tpselepedis` or `spectral`
+- *--coarse_space*: the coarse space used in two-lvel KFAC. It can be `nicolaides`, `residual`, `tpselepedis` or `spectral`
 
-- *--krylov*: Wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
+- *--krylov*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
 
 
 
