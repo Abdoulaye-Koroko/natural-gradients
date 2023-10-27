@@ -1,4 +1,4 @@
-certifi==2022.12.7
+ertifi==2022.12.7
 charset-normalizer==2.1.1
 contourpy==1.1.1
 cycler==0.12.1
@@ -15,10 +15,6 @@ MarkupSafe==2.1.2
 mat4py==0.6.0
 matplotlib==3.8.0
 mpmath==1.3.0
-<<<<<<< HEAD
--e git+https://gitlab.ifpen.fr/supercalcul/natural-gradients.git@6c4f878a2ba3c59815f43271dbc0e95c95805e81#egg=Natural_gradient
-=======
->>>>>>> 8902fb33fec939697b0e011698696ee21cf7bc4d
 networkx==3.0
 numpy==1.24.1
 packaging==23.2
@@ -30,10 +26,12 @@ requests==2.28.1
 scipy==1.11.3
 six==1.16.0
 sympy==1.12
+torch==2.1.0+cu118
 torch-fidelity==0.3.0
+torchaudio==2.1.0+cu118
 torchmetrics==1.2.0
+torchvision==0.16.0+cu118
 tqdm==4.66.1
 triton==2.1.0
 typing_extensions==4.4.0
 urllib3==1.26.13
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
