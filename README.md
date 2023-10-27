@@ -151,7 +151,7 @@ python apps/cnn_autoencoder/train.py --data --optim kfac
 ```
 
 The parameter are the same as in the case of the previous subsection. But here the *--optim* argument can only be either `kfac`, `sgd` or `adam`. You can set the *--data*
-argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defined in `apps/cnn_autoencoder/train.py` and corresponding to each data. If you want to train your own model with your own data, you just need to create your model, load your dataset and call them in `apps/cnn_autoencoder/train.py` function.
+argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defined in `apps/cnn_autoencoder/train.py`. The model will correspond to the selected data. If you want to train your own model with your own data, you just need to create your model, load your dataset and call them in `apps/cnn_autoencoder/train.py` function.
 ### DCGANS
 
 
