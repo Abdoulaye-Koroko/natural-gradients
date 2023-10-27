@@ -177,7 +177,7 @@ $ conda install conda-pack
 Then pack your environment:
 
 ```sh
-$ conda pack -n my_env --ignore-editable-packages
+$ conda-pack -f --ignore-missing-files --exclude lib/python3.1 --ignore-editable-packages
 
 ```
 An archive `my_env.tar.gz` is ceated in the folder `natural-gradients`. Now you have to be copy the project on the supercomputer. For example, on `ener440`, you have to run
