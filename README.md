@@ -144,7 +144,14 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 ### Deep convolutional auto-encoder
 
+You can train a network containing **Transposed convolutional layer** with `KFAC` optimizer. Other natural gradient-based optimizers do not currently handle transposed convolutions. These methods should be extended to these types of convolutions in the very near future. Here, we provide an example of training convolutional auto-encoders that contain transposed convolutions. As in the case of the previous subsection, you just need to run the following command-line:
 
+```sh
+python apps/cnn_autoencoder/train.py --data --optim kfac
+```
+
+The parameter are the same as in the case of the previous subsection. But here the *--optim* argument can only be either `kfac`, `sgd` or `adam`. You can set the *--data*
+argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defined in `apps/cnn_autoencoder/train.py` and corresponding to each data. If you want to train your own model with your own data, you just need to create your model, load your dataset and call them in `apps/cnn_autoencoder/train.py` function.
 ### DCGANS
 
 
