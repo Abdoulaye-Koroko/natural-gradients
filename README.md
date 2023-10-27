@@ -152,7 +152,10 @@ python apps/cnn_autoencoder/train.py --data --optim kfac
 
 The parameter are the same as in the case of the previous subsection. But here the *--optim* argument can only be either `kfac`, `sgd` or `adam`. You can set the *--data*
 argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defined in `apps/cnn_autoencoder/train.py`. The model will correspond to the selected data. If you want to train your own model with your own data, you just need to create your model, load your dataset and call them in `apps/cnn_autoencoder/train.py` function.
+
 ### DCGANS
+
+
 
 
 ## Training on a supercomputer
@@ -166,7 +169,7 @@ $ git clone https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
 $ cd natural-gradients
 $ conda create --name my_env
 $ conda activate my_env
-$ pip install -e .
+$ conda install pip
 $ pip install -r requirements.txt
 $ conda install conda-pack
 ```
@@ -192,7 +195,13 @@ $ tar -zxf my_env.tar.gz -C my_env
 $ source my_env/bin/activate
 ```
 
-You can now train your models on the supercomputer.
+Before using the package, make sure to install it before:
+
+```sh
+$ cd natural-gradients
+$ pip install -e .
+```
+You can now train your models on the supercomputer. 
 
 ## References
 
