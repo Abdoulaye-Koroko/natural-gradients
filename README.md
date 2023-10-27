@@ -177,7 +177,7 @@ $ conda install conda-pack
 Then pack your environment:
 
 ```sh
-$ conda pack -n my_env
+$ conda pack -n my_env --ignore-editable-packages
 
 ```
 An archive `my_env.tar.gz` is ceated in the folder `natural-gradients`. Now you have to be copy the project on the supercomputer. For example, on `ener440`, you have to run
@@ -190,6 +190,7 @@ $ scp -r natural-gradients <login>@ener440
 After that, you have to go on the supercomputer, untar the file `my_env.tar.gz` contained in `natural-gradients` folder and source the environnement:
 
 ```sh
+$ cd natural-gradients
 $ mkdir my_env
 $ tar -zxf my_env.tar.gz -C my_env
 $ source my_env/bin/activate
@@ -198,7 +199,6 @@ $ source my_env/bin/activate
 Before using the package, make sure to install it before:
 
 ```sh
-$ cd natural-gradients
 $ pip install -e .
 ```
 You can now train your models on the supercomputer. 
