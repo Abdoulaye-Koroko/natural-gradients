@@ -119,7 +119,7 @@ $ python apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac --lr 1e-4 --dampin
 
 ```
 
-All the default parameters of the functions `train_mlp.py` and `train_cnn.py` can be changed via `--` option. Below are different important parameters
+All the default parameters of the functions `train_mlp.py` and `train_cnn.py` can be changed via `--` option. Below are different parameters
 
 - *--optim*: the optimizer name. It can be set to `kfac` (for KFAC optimizer), `kpsvd` (for KPSVD optimizer), `deflation` (for Deflation optimizer), `lanczos` (for Lanczos optimizer), `kfac_cor` (for KFAC corrected), `twolevel_kfac` (for two-level KFAC), `exactNG` (for exact natural gradient), `adam` (for ADAM) and `sgd` (for SGD)
 
