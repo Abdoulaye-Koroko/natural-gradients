@@ -155,7 +155,12 @@ argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defi
 
 ### DCGANS
 
+You can train DCGANs with the KFAC optimizer. You have the choice of training both the generator and the discriminator with KFAC, or training one of them with KFAC and the other with another optimizer (e.g. ADAM or SGD). Below is an example of training a DCGAN with the MNIST dataset, using the KFAC optimizer for both the generator and the discriminator.
 
+```sh
+$ cd apps/gans
+$ python train.py --config configs/MNIST/kfac2.yml
+```
 
 
 ## Training on a supercomputer
