@@ -29,8 +29,6 @@ def train(args):
     
         tensorboard_name = args.tensorboard_name
         
-        model = args.model
-        
         fisher_batch = int(batch_size/4)
         
         lr = args.lr
@@ -45,26 +43,20 @@ def train(args):
         
         criterion = nn.CrossEntropyLoss() 
         
-        root = model
+        root = data
         
-        if model =="cnn_autoencoder_mnist":
+        if data =="MNIST":
             
             model = cnn_autoencoder_mnist()
             
             criterion = nn.BCELoss()
         
-        elif model == "cnn_autoencoder_cifar":
+        elif model == "CIFAR10":
             
             model = cnn_autoencoder_cifar()
             
             criterion = nn.MSELoss() 
         
-        elif model == "cnn_autoencoder_svhn":
-            
-            model = cnn_autoencoder_svhn()
-            
-            criterion = nn.MSELoss() 
-            
         model = model.to(device)
         
         since = time.time()
@@ -261,8 +253,6 @@ if __name__=="__main__":
     
     parser = argparse.ArgumentParser(description='Function arguments')
     
-    parser.add_argument('--model', type=str, default ="cnn_autoencoder_mnist",
-                        help='model name')
     parser.add_argument('--optim', type=str, default="kfac",
                         help='optimizer name')
     
