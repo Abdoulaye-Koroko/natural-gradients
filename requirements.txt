@@ -15,7 +15,7 @@ MarkupSafe==2.1.2
 mat4py==0.6.0
 matplotlib==3.8.0
 mpmath==1.3.0
--e git+https://gitlab.ifpen.fr/supercalcul/natural-gradients.git@7be29595dc978fba689afa3bbd3a817273884431#egg=Natural_gradient
+-e git+https://gitlab.ifpen.fr/supercalcul/natural-gradients.git@6c4f878a2ba3c59815f43271dbc0e95c95805e81#egg=Natural_gradient
 networkx==3.0
 numpy==1.24.1
 packaging==23.2
