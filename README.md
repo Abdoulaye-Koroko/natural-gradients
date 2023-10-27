@@ -127,19 +127,19 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 - *--data* : the dataset. It can be `CURVES`, `MNIST` or `FACES` for the three MLP deep auto-encoder problems. for each data specified, a model architecture associated to it and implemented in `apps/mlp_cnn/models.py` is automatically set up. To train your own model with your own dataset, you need to define your model and data and call them in train_mlp.py` or train_cnn.py`
 
-- *--batch_size*: batch size
+- *--batch_size (int)*: batch size
 
-- *--lr*: learning rate
+- *--lr (int)*: learning rate
 
-- *--damping*: regularization parameter for the curvature matrix (only applies to second-order methods)
+- *--damping (float)*: regularization parameter for the curvature matrix (only applies to second-order methods)
 
-- *--clipping*: kl-clipping parameter (only apply to second-order method)
+- *--clipping (float)*: kl-clipping parameter (only apply to second-order method)
 
-- *--momentum*: momentum parameter
+- *--momentum (float)*: momentum parameter
 
-- *--coarse_space*: the coarse space used in two-lvel KFAC. It can be `nicolaides`, `residual`, `tpselepedis` or `spectral`
+- *--coarse_space (str)*: the coarse space used in two-lvel KFAC. It can be `nicolaides`, `residual`, `tpselepedis` or `spectral`
 
-- *--krylov*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
+- *--krylov (str)*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
 
 
 ### Deep convolutional auto-encoder
@@ -161,6 +161,44 @@ You can train DCGANs with the KFAC optimizer. You have the choice of training bo
 $ cd apps/gans
 $ python train.py --config configs/MNIST/kfac2.yml
 ```
+
+Here you just need to privide as argument the path towards a **.yml** file containing the parameters of `train.py`. Examples of arguments are provided in `apps/gans/configs` folder. Below are what a *config.yml* file expects.
+
+- *n_epochs (int)*: number of epoch
+    
+- *batch_size (int)*: batch size
+
+- *device (str)*: the device for training the models. it can be set to `"cpu"` or `"cuda"`
+
+- *z_dim (int)*: the dimension of noise vector used by the generator to generate fake images
+
+- *gen_optim (str)*: the optimizer used to train the generator. It can be set to `"kfac"`, `"adam"` or `"sgda"`
+
+- *crit_optim (str)*: the optimizer used to train the discriminator. It can be set to `"kfac"`, `"adam"` or `"sgda"`
+
+- *gen_lr (float)*:  the learning rate of the genrator's optimizer
+
+- *crit_lr (flaot)*: the learning rate of the discriminator's optimizer
+
+- *clipping (float)*: the parameter for kl-clipping. Only applies when the optimizer is set to `"kfac"`
+
+- *damping (float)*: the regularization parameter for the curvature matrix. Only applies when the optimizer is set to `"kfac"`
+
+- *T_cov (int)*: the frequence of update of the curvature matrix. Only applies when the optimizer is set to `"kfac"`
+
+- *T_inv (int)*: the frequence of computing the inverse of the curvature matrix. Only applies when the optimizer is set to `"kfac"`
+
+- *momentum (float)*: the momentum parameter of sgd optimizer
+
+- *c_lambda (float)*: the regularization parameter for gradient penality of the discriminator's loss
+
+- *crit_repeats (int)*: the number of updates of the discriminator before an update of the generator
+
+- *weight_decay (float)*: the deacay parameter for the optimizers
+
+- *data_root (str)*: the path towards the datasets 
+
+
 
 
 ## Training on a supercomputer
