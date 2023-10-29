@@ -54,7 +54,98 @@ You can use the optimizers developed to train several types of deep neural netwo
 
 To use one of the proposed natural-gradient methods, you can write your training function as follows.
 
+#### Using the true Fisher
+Since the Fishet Information Matrix (FIM) is defined as an expectation with respect to model's joint distribution, we need to estimate it with Monte-Carlo method. So it's necessary to use inputs $x$'s from the training data and targets y's sampled from the model's conditional distribution. The model's conditional distribution is defined by the loss function used to train the network. Fortunately, for most pratical loss functions, the model's conditional distribution is straithfoward to define. For example, when the loss function is the *mean square error* or the $\ell_{2}$-norm, the model distribution is the **multivariate normal distribution**. When It 's the *binary-cross-entropy* loss function, the model distribution can be taken as the **Bernoulli distribution**. And finally, when it's the *cross-entropy* loss function, the model's conditional distribution is defined as the **multinomial distribution**.
+
+Here is the code snapset of training a model with natural gradient-based method based on an estimation of the true Fisher.
+
+```python
+#First import the preconditioner of interest as bellow
+from optimizers.kfac import KFAC
+from optimizers.kpsvd import KPSVD
+from optimizers.deflation import Deflation
+from optimizers.kfac_cor import KFAC_CORRECTED
+from optimizers.lanczos import Lanczos
+from optimizers.twolevel_kfac import TwolevelKFAC
+from optimizers.exact_natural_gradient import ExactNG
+
+# Define your model
+model = Mymodel()
+
+#Define the optimizer
+optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
+
+preconditioner = KFAC(model) # It can be any of the imported preconditioner above
+
+#Define your dataloader
+dataset = Mydata()
+
+dataloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+                                          shuffle=True,drop_last=True)
+#Define your loss function
+criterion = Myloss()
+
+#device
+device = torch.device("cuda")
+
+#Training loop
+for epoch in range(num_epochs):
+    
+    model.train()
+    
+    for iter,batch in enumerate(trainloader):
+        
+        optimizer.zero_grad()
+        
+        inputs,labels = batch
+        
+        inputs,labels = inputs.to(device),labels.to(device)
+        
+        with torch.set_grad_enabled(True):
+            
+            outputs = model(inputs)
+            
+            loss = criterion(outputs,labels)
+
+
+        preconditioner.update_stats = True
+        
+        index = np.random.randint(low=0, high=batch_size, size=fisher_batch_size) # fisher_batch_size is the size of the batch used to compute the curvature matrix
+        
+        outputs_fisher = model(inputs[index])
+        
+        with torch.no_grad():
+            
+            sample_y = model_conditional_distribution(outputs_fisher) # Sample from the model's conditional distribution
+            
+            # model_conditional_distribution should be defined according to the loss function. For example if the loss function is the cross-entropy loss function, then,
+            
+            # sampled_y can be defined as follows:
+            
+            # sampled_y = torch.multinomial(torch.nn.functional.softmax(outputs_fisher.cpu().data, dim=1),1).squeeze().to(device)
+            
+        loss_sample = criterion(outputs_fisher,sampled_y)
+        
+        loss_sample.backward(retain_graph=True)
+        
+        preconditioner.step(update_params=False) 
+        
+        optimizer.zero_grad()
+        
+        preconditioner.update_stats = False
+
+        loss.backward()
+
+        preconditioner.step(update_params=True) # Preconditionnes the gradients with the computed Fisher   
+
+        optimizer.step()
+```
+
 #### Using the empirical Fisher
+
+Sometimes, it can be difficult to sample targets y's from the model's conditional distribution. This is mainly due to a complex loss function or a huge cost of sampling from the model's conditional distribution in muti-dimensional case.  In such a situation, one can use targets y's from the training data to estimate the Fisher. In that case, the curvature is said to be an estimation of the empirical Fisher. 
+
+Below is a way to use a natural gradient-based optimization based on an estimation of the empirical Fisher.
 
 ```python 
 #First import the preconditioner of interest as bellow
@@ -112,9 +203,6 @@ for epoch in range(num_epochs):
 
             optimizer.step()
 ```
-
-
-#### Using the true Fisher
 
 
 ### MLP and CNN
