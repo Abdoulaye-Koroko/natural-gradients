@@ -52,7 +52,9 @@ You can use the optimizers developed to train several types of deep neural netwo
 
 ### General use case
 
-To use one of the proposed natural-gradient methods, you can write your training function as follows:
+To use one of the proposed natural-gradient methods, you can write your training function as follows.
+
+#### Using the empirical Fisher
 
 ```python 
 #First import the preconditioner of interest as bellow
@@ -84,28 +86,35 @@ criterion = Myloss()
 device = torch.device("cuda")
 
 # Training loop
-for iter,batch in enumerate(trainloader):
+for epoch in range(num_epochs):
+    
+    model.train()
+    
+    for iter,batch in enumerate(trainloader):
 
-    optimizer.zero_grad()
-    
-    inputs,labels=batch
-    
-    inputs,labels = inputs.to(device),labels.to(device)
-    
-    outputs = model(inputs)
-    
-    with torch.set_grad_enabled(True):
-        
-        loss = criterion(outputs,labels)
-        
-        preconditioner.update_stats = True
-        
-        loss.backward()
-        
-        preconditioner.step(update_params=True) 
-    
-        optimizer.step()
+        optimizer.zero_grad()
+
+        inputs,labels = batch
+
+        inputs,labels = inputs.to(device),labels.to(device)
+
+        outputs = model(inputs)
+
+        with torch.set_grad_enabled(True):
+
+            loss = criterion(outputs,labels)
+
+            preconditioner.update_stats = True
+
+            loss.backward()
+
+            preconditioner.step(update_params=True) 
+
+            optimizer.step()
 ```
+
+
+#### Using the true Fisher
 
 
 ### MLP and CNN
