@@ -344,7 +344,7 @@ $ pip install -e .
 You can now train your models on the supercomputer. 
 
 ## References
-
+```
 @ARTICLE{Amari1998,
   author = {Amari, Shun-Ichi},
   title = {Natural Gradient Works Efficiently in Learning},
@@ -434,3 +434,6 @@ You can now train your models on the supercomputer.
   number = {1},
   doi = {10.1016/S0377-0427(00)00393-9}
 }
+
+```
+
