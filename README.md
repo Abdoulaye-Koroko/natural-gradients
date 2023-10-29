@@ -345,3 +345,92 @@ You can now train your models on the supercomputer.
 
 ## References
 
+@ARTICLE{Amari1998,
+  author = {Amari, Shun-Ichi},
+  title = {Natural Gradient Works Efficiently in Learning},
+  journal = {Neur. Comput.},
+  year = {1998},
+  volume = {10},
+  pages = {251--276},
+  number = {2},
+  doi = {10.1162/089976698300017746},
+}
+@inproceedings{MartensGrosse2015,
+  author = {Martens, James and Grosse, Roger},
+  title = {Optimizing neural networks with {K}ronecker-factored approximate
+	curvature},
+  editor = {Bach, Francis and Blei, David},
+  booktitle = {32nd International Conference on Machine Learning},
+  year = {2015},
+  month = {6--11 Jul},
+  series = {Proceedings in Machine Learning Research},
+  volume = {37},
+  pages = {2408--2417},
+  address = {Lille, France},
+  url = {http://proceedings.mlr.press/v37/martens15.html}
+}
+
+@INPROCEEDINGS{GrosseMartens2016,
+  author = {Grosse, Roger and Martens, James},
+  title = {A {K}ronecker-factored approximate {F}isher matrix for convolution
+	layers},
+  booktitle = {33rd International Conference on Machine Learning},
+  editor = {Balcan, Maria Florina and Weinberger, Kilian Q.},
+  year = {2016},
+  month = {19--24 Jun},
+  series = {Proceedings of Machine Learning Research},
+  volume = {48},
+  pages = {573--582},
+  address = {New York},
+  url = {http://proceedings.mlr.press/v48/grosse16.html}
+}
+
+@ARTICLE{refId0,
+	author = {Koroko, Abdoulaye and Anciaux-Sedrakian, Ani and Gharbia, Ibtihel Ben and Gar\`es, Val\'erie and Haddou, Mounir and Tran, Quang Huy},
+	title = {Efficient approximations of the {F}isher matrix in neural networks using {K}ronecker product singular value decomposition},
+	DOI = {10.1051/proc/202373218},
+	journal = {ESAIM: ProcS},
+	year = {2023},
+	volume = {73},
+	pages = {218--237},
+}
+
+@misc{Koroko2023analysis,
+  title = {Analysis and Comparison of Two-Level {KFAC} Methods for Training Deep Neural Networks}, 
+  author = {Koroko, Abdoulaye and Anciaux-Sedrakian, Ani and Ben Gharbia, Ibtihel
+            and Garès, Valérie and Haddou, Mounir and Tran, Quang Huy},
+  year = {2023},
+  eprint = {2303.18083},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG}
+}
+@INPROCEEDINGS{twolevels,
+  author = {Tselepidis, Nikolaos and Kohler, Jonas and Orvieto, Antonio},
+  title = {Two-Level {K-FAC} Preconditioning for Deep Learning},
+  booktitle = {12th Annual Workshop on Optimization for Machine Learning},
+  address = {virtual},
+  year = {2020},
+  url = {https://www.opt-ml.org/papers/2020/paper_63.pdf}
+}
+@inproceedings{Benzing2022GradientDO,
+  title = {Gradient Descent on Neurons and its Link to Approximate Second-Order Optimization},
+  author = {Benzing, Frederik},
+  booktitle = {39th International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {162},
+  year = {2022},
+  month = {17--23 Jul},
+  address = {Baltimore, Maryland},
+  url = {https://proceedings.mlr.press/v162/benzing22a.html}
+}
+
+@ARTICLE{VanLoan2000,
+  author = {van Loan, Charles F.},
+  title = {The ubiquitous {K}ronecker product},
+  journal = {J. Comput. Appl. Math.},
+  year = {2000},
+  volume = {123},
+  pages = {85--100},
+  number = {1},
+  doi = {10.1016/S0377-0427(00)00393-9}
+}
