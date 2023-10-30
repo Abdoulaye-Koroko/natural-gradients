@@ -26,7 +26,7 @@ def train(args):
         device = torch.device("cuda")
         data = args.data
         batch_size = args.batch_size
-        tensorboard_name = args.tensorboard_name
+        result_name = args.result_name
         fisher_batch = int(batch_size/4)
         lr = args.lr
         damping = args.damping
@@ -75,7 +75,7 @@ def train(args):
             criterion = nn.CrossEntropyLoss()
         
         since = time.time()
-        data_root = "../../data/"
+        data_root = args.data_path
         train_samples,val_samples ,trainloader,testloader = read_data_sets(os.path.abspath(data_root + data),batch_size)
         
         num_iter_per_epoch = len(trainloader)
@@ -290,7 +290,11 @@ if __name__=="__main__":
     parser.add_argument('--data', type=str, default="CURVES",
                         help='data name')
     
-    parser.add_argument('--tensorboard_name', type=str, default="kfac",
+    parser.add_argument('--data_path', type=str, default="./data/",
+                        help='path towards the folder containing the data')
+
+    
+    parser.add_argument('--result_name', type=str, default="kfac",
                         help='tensorbord_name name')
     
     parser.add_argument('--batch_size', type=int, default=128,
@@ -328,4 +332,14 @@ if __name__=="__main__":
     args = parser.parse_args()
     
     results = train(args)
+    
+    output_folder = "apps/mlp_cnn/results/"
+    
+    if not os.path.exists(output_folder):
+        
+        os.makedirs(output_folder)
+        
+    np.save(output_folder + f'{args.result_name}.npy', results) 
+    
+    print(f"The results are saved in {output_folder} under the name {args.result_name}.npy")
     
