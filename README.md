@@ -33,6 +33,9 @@ $ cd natural-gradients
 Then, create a new virtual environment and install all the required packages:
 
 ```sh
+$ conda create --name my_env
+$ conda activate my_env
+$ conda install pip
 $ pip install -e .
 $ pip install -r requirements.txt
 ```
