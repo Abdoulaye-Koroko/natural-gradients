@@ -39,15 +39,12 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-You can use the optimizers developed to train several types of deep neural networks. Below are the different types of network with compatible optimizers
+You can use the optimizers to train several types of deep neural networks. Below are the different types of compatible layers.
+- Multi-layer perceptrons (MLP) layers : all optimizer
 
-- Multi-layer perceptrons (MLP) : all optimizer
+- Convolutional layers: all optimizer
 
-- Convolutional neural networks (CNN): all optimizer
-
-- Deep convolutional auto-encoder (contains transposed convolutional layers): KFAC
-
-- Deep convolutional GANs (contains transposed convolutional layers) : KFAC
+- Transposed convolutional layers: KFAC
 
 
 ### General use case
@@ -55,7 +52,7 @@ You can use the optimizers developed to train several types of deep neural netwo
 To use one of the proposed natural-gradient methods, you can write your training function as follows.
 
 #### Using the true Fisher
-Since the Fishet Information Matrix (FIM) is defined as an expectation with respect to model's joint distribution, we need to estimate it with Monte-Carlo method. So it's necessary to use inputs $x$'s from the training data and targets y's sampled from the model's conditional distribution. The model's conditional distribution is defined by the loss function used to train the network. Fortunately, for most pratical loss functions, the model's conditional distribution is straithfoward to define. For example, when the loss function is the *mean square error* or the L2 norm, the model distribution is the **multivariate normal distribution**. When It 's the *binary-cross-entropy* loss function, the model distribution can be taken as the **Bernoulli distribution**. And finally, when it's the *cross-entropy* loss function, the model's conditional distribution is defined as the **multinomial distribution**.
+Since the Fisher Information Matrix (FIM) is defined as an expectation with respect to model's joint distribution, we need to estimate it with Monte-Carlo method. So it's necessary to use inputs $x$'s from the training data and targets y's sampled from the model's conditional distribution. The model's conditional distribution is defined by the loss function used to train the network. For most pratical loss functions, the model's conditional distribution is straithfoward to define. For example, when the loss function is the *mean square error* or the L2 norm, the model distribution is the **multivariate normal distribution**. When It 's the *binary-cross-entropy* loss function, the model distribution can be taken as the **Bernoulli distribution**. And finally, when it's the *cross-entropy* loss function, the model's conditional distribution is defined as the **multinomial distribution**.
 
 Here is the code snapset of training a model with natural gradient-based method based on an estimation of the true Fisher.
 
@@ -116,13 +113,21 @@ for epoch in range(num_epochs):
         
         with torch.no_grad():
             
-            sample_y = model_conditional_distribution(outputs_fisher) # Sample from the model's conditional distribution
+            sampled_y = model_conditional_distribution(outputs_fisher) # Sample from the model's conditional distribution
             
-            # model_conditional_distribution should be defined according to the loss function. For example if the loss function is the cross-entropy loss function, then,
+            # model_conditional_distribution should be defined according to the loss function. For example if the loss function is 
             
-            # sampled_y can be defined as follows:
+            # - the cross-entropy loss function, then sampled_y can be defined as follows:
             
-            # sampled_y = torch.multinomial(torch.nn.functional.softmax(outputs_fisher.cpu().data, dim=1),1).squeeze().to(device)
+                # sampled_y = torch.multinomial(torch.nn.functional.softmax(outputs_fisher.cpu().data, dim=1),1).squeeze().to(device)
+            
+            # - the binary cross-entropy loss function, sampled_y is defined as follows :
+            
+                # sampled_y = torch.bernoulli(outputs_fisher)
+                
+            # - the mean square error, then sampled_y can be defined by:
+            
+                # sampled_y = torch.normal(mean=outputs_fisher)
             
         loss_sample = criterion(outputs_fisher,sampled_y)
         
@@ -207,7 +212,7 @@ for epoch in range(num_epochs):
 
 ### MLP and CNN
 
-You can train MLP or CNN networks with any optimizer using the `train_mlp.py` and `train_cnn.py` functions defined in the apps/mlp_cnn folder `apps/mlp_cnn`.
+You can train MLP or CNN networks with any optimizer using the `train_mlp.py` aor `train_cnn.py` functions defined in the apps/mlp_cnn folder `apps/mlp_cnn`.
 
 For example, to train the MLP deep auto-encoder with the CURVES dataset with KFAC optimizer, you just need to run the following command:
 
@@ -342,6 +347,34 @@ Before using the package, make sure to install it before:
 $ pip install -e .
 ```
 You can now train your models on the supercomputer. 
+
+Bellow is an example of a job to simultaneously train 4 models with 4 differents GPUs on **Topaze** supercomputer.
+
+```
+#!/bin/bash
+#MSUB -r my_job # JOB NAME
+#MSUB -N 1 #Number of nodes
+#MSUB -n 4
+#MSUB -c 32
+#MSUB -T 259200 # Wall time in seconds
+#MSUB -o outpout.out # Output file
+#MSUB -e error.err # Error file
+#MSUB -q a100
+#MSUB -m scratch
+#MSUB -Q long
+
+set -x
+
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac --lr 1e-4 --damping 1e-4 > output_kfac.out &
+
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kpsvd --lr 1e-4 --damping 1e-4 > output_kpsvd.out &
+
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim deflation --lr 1e-4 --damping 1e-4 > output_deflation.out &
+
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac_cor --lr 1e-4 --damping 1e-4 > output_kfac_cor.out &
+
+wait
+```
 
 ## References
 ```
