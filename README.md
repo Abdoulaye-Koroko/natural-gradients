@@ -376,6 +376,12 @@ srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data 
 wait
 ```
 
+Let's say you save the above job un the name `my_job.sh`. You can submit your job on the supercomputer with the following command-line:
+
+```sh
+$ ccc_msub my_job.sh
+```
+
 ## References
 ```
 @ARTICLE{Amari1998,
