@@ -371,13 +371,13 @@ Bellow is an example of a job to simultaneously train 4 models with 4 differents
 
 set -x
 
-srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac --lr 1e-4 --damping 1e-4 > output_kfac.out &
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --data_path ./data/  --optim kfac --lr 1e-4 --damping 1e-4 --result_name kfac > output_kfac.out &
 
-srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kpsvd --lr 1e-4 --damping 1e-4 > output_kpsvd.out &
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --data_path ./data/  --optim kpsvd --lr 1e-4 --damping 1e-4 --result_name kpsvd > output_kpsvd.out &
 
-srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim deflation --lr 1e-4 --damping 1e-4 > output_deflation.out &
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --data_path ./data/  --optim deflation --lr 1e-4 --damping 1e-4 --result_name deflation > output_deflation.out &
 
-srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac_cor --lr 1e-4 --damping 1e-4 > output_kfac_cor.out &
+srun -n 1 -c 32 '--gpus=1' --exclusive python3 apps/mlp_cnn/train_mlp.py --data CURVES --data_path ./data/   --optim kfac_cor --lr 1e-4 --damping 1e-4 --result_name kfac_cor> output_kfac_cor.out &
 
 wait
 ```
