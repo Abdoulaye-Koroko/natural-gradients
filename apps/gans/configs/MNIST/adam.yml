@@ -25,7 +25,7 @@ c_lambda: 10
 
 crit_repeats: 5
 
-data_root: "../../../data/"
+data_root: "./data/"
 
 data: "MNIST"
 

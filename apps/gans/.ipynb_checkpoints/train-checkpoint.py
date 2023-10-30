@@ -379,7 +379,7 @@ def train(config):
     
     results = {"FID": np.array(fids)}
     
-    #np.save(os.path.join(FID_folder,name+'.npy'),results)
+    return results
      
 
             
@@ -390,8 +390,11 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='Function arguments')
 
-    parser.add_argument('--config', type=str, default ="configs/MNIST/adam.yml",
+    parser.add_argument('--config', type=str, default ="apps/gans/configs/MNIST/adam.yml",
                     help='path to config')
+    
+    parser.add_argument('--result_name', type=str, default="kfac2",
+                        help='tensorbord_name name')
 
     args = parser.parse_args() 
     
@@ -401,8 +404,18 @@ if __name__ == '__main__':
     
     t1 = time.time()
     
-    train(config)
+    results = train(config)
     
     t2 = time.time()
     
     print(f"Elapsed time: {(t2-t1)//60} min {(t2-t1)%60} s")
+    
+    output_folder = "apps/gans/results/"
+    
+    if not os.path.exists(output_folder):
+        
+        os.makedirs(output_folder)
+        
+    np.save(output_folder + f'{args.result_name}.npy', results) 
+    
+    print(f"The results are saved in {output_folder} under the name {args.result_name}.npy")

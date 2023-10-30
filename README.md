@@ -220,7 +220,7 @@ You can train MLP or CNN networks with any optimizer using the `train_mlp.py` ao
 For example, to train the MLP deep auto-encoder with the CURVES dataset with KFAC optimizer, you just need to run the following command:
 
 ```sh
-$ python apps/mlp_cnn/train_mlp.py --data CURVES --optim kfac --lr 1e-4 --damping 1e-4
+$ python apps/mlp_cnn/train_mlp.py --data CURVES --data_path ./data/ --optim kfac --lr 1e-4 --damping 1e-4 --num_epochs 10 --result_name kfac
 
 ```
 
@@ -228,9 +228,9 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 - *--optim*: the optimizer name. It can be set to `kfac` (for KFAC optimizer), `kpsvd` (for KPSVD optimizer), `deflation` (for Deflation optimizer), `lanczos` (for Lanczos optimizer), `kfac_cor` (for KFAC corrected), `twolevel_kfac` (for two-level KFAC), `exactNG` (for exact natural gradient), `adam` (for ADAM) and `sgd` (for SGD)
 
-- *--num_epochs*: number of epochs
+- *--num_epochs (int)*: number of epochs
 
-- *--data* : the dataset. It can be `CURVES`, `MNIST` or `FACES` for the three MLP deep auto-encoder problems. for each data specified, a model architecture associated to it and implemented in `apps/mlp_cnn/models.py` is automatically set up. To train your own model with your own dataset, you need to define your model and data and call them in train_mlp.py` or train_cnn.py`
+- *--data (str)* : the dataset. It can be `CURVES`, `MNIST` or `FACES` for the three MLP deep auto-encoder problems. for each data specified, a model architecture associated to it and implemented in `apps/mlp_cnn/models.py` is automatically set up. To train your own model with your own dataset, you need to define your model and data and call them in train_mlp.py` or train_cnn.py`
 
 - *--batch_size (int)*: batch size
 
@@ -246,13 +246,17 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 - *--krylov (str)*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
 
+- *data_path (str)*: the path towards the folder containing the dataset
+
+- *result_name (str)*: the name under which the results are saved.
+
 
 ### Deep convolutional auto-encoder
 
 You can train a network containing **Transposed convolutional layer** with `KFAC` optimizer. Other natural gradient-based optimizers do not currently handle transposed convolutions. These methods should be extended to these types of convolutions in the very near future. Here, we provide an example of training convolutional auto-encoders that contain transposed convolutions. As in the case of the previous subsection, you just need to run the following command-line:
 
 ```sh
-python apps/cnn_autoencoder/train.py --data --optim kfac
+python apps/cnn_autoencoder/train.py --optim kfac --data MNIST --data_path ./data/ --lr 1e-4 --damping 1e-4 --num_epochs 1 --result_name kfac
 ```
 
 The parameter are the same as in the case of the previous subsection. But here the *--optim* argument can only be either `kfac`, `sgd` or `adam`. You can set the *--data*
@@ -263,11 +267,10 @@ argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defi
 You can train DCGANs with the KFAC optimizer. You have the choice of training both the generator and the discriminator with KFAC, or training one of them with KFAC and the other with another optimizer (e.g. ADAM or SGD). Below is an example of training a DCGAN with the MNIST dataset, using the KFAC optimizer for both the generator and the discriminator.
 
 ```sh
-$ cd apps/gans
-$ python train.py --config configs/MNIST/kfac2.yml
+$ python apps/gans/train.py --config apps/gans/configs/MNIST/kfac2.yml --result_name kfac2
 ```
 
-Here you just need to privide as argument the path towards a **.yml** file containing the parameters of `train.py`. Examples of arguments are provided in `apps/gans/configs` folder. Below are what a *config.yml* file expects.
+Here you just need to privide as arguments the path towards a **.yml** file containing the parameters of `train.py` and *--result_name* the name under which the results will be saved. Examples of arguments are provided in `apps/gans/configs` folder. Below are what a *config.yml* file expects.
 
 - *n_epochs (int)*: number of epoch
     
