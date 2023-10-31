@@ -151,6 +151,14 @@ for epoch in range(num_epochs):
         optimizer.step() # perform an iteration of the optimization
 ```
 
+A basic example is provided in the folder `examples`. To run it, you just need to run the following command-line:
+
+```sh
+ python examples/train_true_fisher.py --num_epochs 5 --lr 1e-4 --damping 1e-4 --result_name kfac_true_fisher
+```
+It will create a folder `results` in which it will store the results of training. You can use the notebook provided in the `examples` folder to visulaize the training loss.
+You can use the script `grid_true_fisher.py` provided in the `examples` folder to do an hyper-parameters search for this example.
+
 #### Using the empirical Fisher
 
 Sometimes, it can be difficult to sample targets y's from the model's conditional distribution. This is mainly due to a complex loss function or a huge cost of sampling from the model's conditional distribution in muti-dimensional case.  In such a situation, one can use targets y's from the training data to estimate the Fisher. In that case, the curvature is said to be an estimation of the empirical Fisher. 
@@ -200,6 +208,8 @@ for epoch in range(num_epochs):
         inputs,labels = batch
 
         inputs,labels = inputs.to(device),labels.to(device)
+        
+        preconditioner.update_stats = True
 
         outputs = model(inputs)
 
@@ -207,13 +217,17 @@ for epoch in range(num_epochs):
 
             loss = criterion(outputs,labels)
 
-            preconditioner.update_stats = True
-
             loss.backward()
 
             preconditioner.step(update_params=True) 
 
             optimizer.step()
+```
+
+As in the case of the true Fisher, an example is provided in `examples` folder. You need to run the command-line
+
+```sh
+ python examples/train_empirical_fisher.py --num_epochs 5 --lr 1e-4 --damping 1e-4 --result_name kfac_true_fisher
 ```
 
 
@@ -255,6 +269,17 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 - *--result_name (str)*: the name under which the results are saved.
 
 
+You can make also make an hyper-parameter search using the `grid_search_mlp.py` or `grid_search_cnn.py` scripts provided in `apps/mlp_cnn` folder. For that, you will need to define you search space in the script an run the command-lines 
+
+```
+python apps/mlp_cnn/grid_search_mlp.py
+```
+or
+
+```
+python apps/mlp_cnn/grid_search_cnn.py
+```
+
 ### Deep convolutional auto-encoder
 
 You can train a network containing **Transposed convolutional layer** with `KFAC` optimizer. Other natural gradient-based optimizers do not currently handle transposed convolutions. These methods should be extended to these types of convolutions in the very near future. Here, we provide an example of training convolutional auto-encoders that contain transposed convolutions. As in the case of the previous subsection, you just need to run the following command-line:
@@ -265,6 +290,12 @@ python apps/cnn_autoencoder/train.py --optim kfac --data MNIST --data_path ./dat
 
 The parameter are the same as in the case of the previous subsection. But here the *--optim* argument can only be either `kfac`, `sgd` or `adam`. You can set the *--data*
 argument to `MNIST` or `CIFAR10` to train a deep convolutional auto-encoder defined in `apps/cnn_autoencoder/train.py`. The model will correspond to the selected data. If you want to train your own model with your own data, you just need to create your model, load your dataset and call them in `apps/cnn_autoencoder/train.py` function.
+
+As in the previous subsection, you can perform a hyper-parameter search with the `grid_search.py` function provided in `apps/cnn_autoencoder` script. For example to perform a grid search with KFAC optimizer, you will need to define you search space and run the command-line
+
+```sh
+python apps/cnn_autoencoder/grid_search.py --optim kfac
+```
 
 ### DCGANS
 
@@ -311,7 +342,7 @@ Here you just need to privide as arguments the path towards a **.yml** file cont
 - *data_root (str)*: the path towards the datasets 
 
 
-
+As previous cases, you can use the `grid_search.py` provided in `apps/gans` to perform an hyper-parameter search.
 
 ## Training on a supercomputer
 
