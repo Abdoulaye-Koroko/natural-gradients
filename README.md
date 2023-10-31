@@ -246,9 +246,9 @@ All the default parameters of the functions `train_mlp.py` and `train_cnn.py` ca
 
 - *--krylov (str)*: wheter to use krylov or not to enrich the coarse space. It is 0 for no and 1 for yes. Only applies to two-level KFAC
 
-- *data_path (str)*: the path towards the folder containing the dataset
+- *--data_path (str)*: the path towards the folder containing the dataset
 
-- *result_name (str)*: the name under which the results are saved.
+- *--result_name (str)*: the name under which the results are saved.
 
 
 ### Deep convolutional auto-encoder
