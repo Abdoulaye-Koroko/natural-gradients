@@ -271,7 +271,7 @@ def train(args):
         print("Training Summary:")
         print(f"\tTraining time: {time_elapsed // 60} minutes {time_elapsed % 60} seconds")
         
-        return result
+        return best_loss,result
     
     
 
@@ -331,7 +331,7 @@ if __name__=="__main__":
 
     args = parser.parse_args()
     
-    results = train(args)
+    _,results = train(args)
     
     output_folder = "apps/mlp_cnn/results/"
     
