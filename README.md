@@ -69,24 +69,26 @@ from optimizers.lanczos import Lanczos
 from optimizers.twolevel_kfac import TwolevelKFAC
 from optimizers.exact_natural_gradient import ExactNG
 
+#device
+device = torch.device("cuda") # or torch.device("cpu")
+
 # Define your model
 model = Mymodel()
 
-#Define the optimizer
+model = model.to(device)
+
+#Define the optimizer (natural gradient-based method)
 optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
 
-preconditioner = KFAC(model) # It can be any of the imported preconditioner above
+preconditioner = KFAC(model) # It can be any of the imported preconditioner above (e.g. KPSVD, Deflation, etc.)
 
 #Define your dataloader
 dataset = Mydata()
 
-dataloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+trainloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                           shuffle=True,drop_last=True)
 #Define your loss function
 criterion = Myloss()
-
-#device
-device = torch.device("cuda")
 
 #Training loop
 for epoch in range(num_epochs):
@@ -101,7 +103,7 @@ for epoch in range(num_epochs):
         
         inputs,labels = inputs.to(device),labels.to(device)
         
-        with torch.set_grad_enabled(True):
+        with torch.set_grad_enabled(True): # Not obliged
             
             outputs = model(inputs)
             
@@ -132,21 +134,21 @@ for epoch in range(num_epochs):
             
                 # sampled_y = torch.normal(mean=outputs_fisher)
             
-        loss_sample = criterion(outputs_fisher,sampled_y)
+        loss_sample = criterion(outputs_fisher,sampled_y) # Compute the loss with sampled targets
         
-        loss_sample.backward(retain_graph=True)
+        loss_sample.backward(retain_graph=True) # compute the gradients with sampled targets
         
-        preconditioner.step(update_params=False) 
+        preconditioner.step(update_params=False) # Compute the curvature matrix using sampled targets 
         
-        optimizer.zero_grad()
+        optimizer.zero_grad() 
         
-        preconditioner.update_stats = False
+        preconditioner.update_stats = False # Not computing the curcature matrix with targets from training data
 
-        loss.backward()
+        loss.backward() #Compute the gradients with targets from training data
 
         preconditioner.step(update_params=True) # Preconditionnes the gradients with the computed Fisher   
 
-        optimizer.step()
+        optimizer.step() # perform an iteration of the optimization
 ```
 
 #### Using the empirical Fisher
@@ -165,8 +167,13 @@ from optimizers.lanczos import Lanczos
 from optimizers.twolevel_kfac import TwolevelKFAC
 from optimizers.exact_natural_gradient import ExactNG
 
+#device
+device = torch.device("cuda")
+
 # Define your model
 model = Mymodel()
+
+model = model.to(device)
 
 #Define the optimizer
 optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=momentum,nesterov=False,weight_decay=weight_decay)
@@ -176,13 +183,10 @@ preconditioner = KFAC(model) # It can be any of the imported preconditioner abov
 #Define your dataloader
 dataset = Mydata()
 
-dataloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+trainloader =  torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                           shuffle=True,drop_last=True)
 #Define your loss function
 criterion = Myloss()
-
-#device
-device = torch.device("cuda")
 
 # Training loop
 for epoch in range(num_epochs):
