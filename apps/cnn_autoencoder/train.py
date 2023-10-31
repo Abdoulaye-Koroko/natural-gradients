@@ -291,7 +291,7 @@ if __name__=="__main__":
 
     args = parser.parse_args()
     
-    results = train(args)
+    _,results = train(args)
     
     output_folder = "apps/cnn_autoencoder/results/"
     
