@@ -25,7 +25,7 @@ Author: Abdoulaye Koroko
 Clone this repository:
 
 ```sh
-$ git clone https://gitlab.ifpen.fr/supercalcul/natural-gradients.git
+$ git clone https://github.com/Abdoulaye-Koroko/natural-gradients.git
 $ cd natural-gradients
 
 ```
